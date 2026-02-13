@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For My Adorable Chubs 🎀</title>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Plus+Jakarta+Sans:wght@300;400;600&family=Parisienne&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+:root {
+    --bg-pink: #fff5f8;
+    --accent-pink: #ffafcc;
+    --deep-pink: #ff8fab;
+    --angry-red: #d90429;
+    --soft-white: rgba(255, 255, 255, 0.9);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-pink);
+    color: #8b5e6a;
+    overflow: hidden;
+}
+
+.bg {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: opacity 1.5s ease-in-out;
+    z-index: -3;
+    opacity: 0;
+}
+.bg.active { opacity: 0.85; }
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 245, 248, 0.3); 
+    z-index: -2;
+}
+
+.card-container {
+    width: 95%;
+    max-width: 400px;
+    z-index: 10;
+}
+
+.card {
+    background: var(--soft-white);
+    padding: 2.5rem 1.5rem;
+    border-radius: 40px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    border: 3px solid white;
+    backdrop-filter: blur(5px);
+}
+
+.shake {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.title-font { font-family: 'Parisienne', cursive; font-size: 2.8rem; color: var(--deep-pink); }
+.handwritten { font-family: 'Dancing Script', cursive; font-size: 1.3rem; color: var(--accent-pink); margin-bottom: 20px; display: block; }
+h2 { font-size: 1rem; margin-bottom: 25px; font-weight: 400; line-height: 1.5; }
+.options-grid { display: grid; gap: 12px; }
+
+button {
+    background: white; border: 2px solid var(--accent-pink);
+    padding: 14px; border-radius: 50px; color: #8b5e6a;
+    font-weight: 600; cursor: pointer; transition: 0.3s;
+}
+
+button:hover { background: var(--accent-pink); color: white; transform: translateY(-3px); }
+button.primary { background: linear-gradient(135deg, var(--accent-pink), var(--deep-pink)); color: white; border: none; margin-top: 15px; }
+
+input[type="date"] {
+    width: 100%; padding: 14px; border-radius: 50px;
+    border: 2px solid var(--accent-pink); margin-bottom: 15px;
+    text-align: center; outline: none;
+}
+
+.hidden { display: none; opacity: 0; }
+.fade-in { animation: fadeIn 0.8s forwards; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.note-display {
+    margin-top: 20px; font-family: 'Dancing Script', cursive; font-size: 1.4rem;
+    color: var(--deep-pink); background: white; padding: 15px;
+    border-radius: 20px; border: 2px solid var(--accent-pink);
+    opacity: 0; transform: scale(0.8);
+}
+.note-display.show-note { animation: notePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes notePop { to { opacity: 1; transform: scale(1); } }
+
+.counter-box { margin: 20px 0; padding: 15px; background: rgba(255, 255, 255, 0.8); border-radius: 25px; border: 1px dashed var(--accent-pink); }
+.counter-num { font-family: 'Parisienne', cursive; font-size: 2.8rem; color: var(--deep-pink); }
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" src="18.mp3" loop></audio>
+
+<div class="bg" id="bg1"></div>
+<div class="bg" id="bg2"></div>
+<div class="overlay"></div>
+
+<div class="card-container">
+    <div class="card" id="step1">
+        <span class="title-font">Hi Chubs</span>
+        <span class="handwritten">I have a surprise for you... 🎀</span>
+        <h2>Enter our special date:</h2>
+        <input type="date" id="dateInput">
+        <button class="primary" onclick="checkDate()">Open My Heart ✨</button>
+    </div>
+
+    <div class="card hidden" id="step2">
+        <span class="title-font">Question 1</span>
+        <h2>What's the #1 thing I love about you? 🦢</h2>
+        <div class="options-grid">
+            <button onclick="nextStep(2, 3)">How adorable I am 🤏</button>
+            <button onclick="nextStep(2, 3)">Because I'm BEAUTIFUL 💖</button>
+            <button onclick="nextStep(2, 3)">Everything. (Trick question!) 🥰</button>
+        </div>
+    </div>
+
+    <div class="card hidden" id="step3">
+        <span class="title-font">Question 2</span>
+        <h2>Who is the luckiest person in the world? 🎀</h2>
+        <div class="options-grid">
+            <button onclick="nextStep(3, 4)">Me, because I have you 🙋‍♂️</button>
+            <button onclick="nextStep(3, 4)">You, because you have me 💞</button>
+        </div>
+    </div>
+
+    <div class="card hidden" id="finalCard">
+        <span class="title-font">Happy Anniversary!</span>
+        <span class="handwritten">To my adorable Chubs 🎀</span>
+        <div class="counter-box">
+            <span class="counter-num" id="daysCounter"></span>
+            <p style="font-size:0.75rem; letter-spacing:1.5px; color: var(--accent-pink); font-weight:600;">DAYS OF US</p>
+        </div>
+        <p style="font-size: 0.85rem; line-height: 1.5;">I am so lucky to have your love and kindness in my life. You are the most adorable person I know... "wag ka hirap ako pinag isipan to"😆</p>
+        <button class="primary" onclick="showNote()">Read my note to you 💌</button>
+        <div id="noteBox" class="note-display hidden"></div>
+    </div>
+</div>
+
+<script>
+const correctDate = "2025-02-14"; 
+const startDate = new Date(2025, 1, 14); 
+const images = ["1.jpeg", "2.jpeg", "3.jpeg", "4.jpeg", "5.jpeg", "6.jpeg", "7.jpeg", "8.jpeg", "9.jpeg", "10.webp"];
+let currentIndex = 0;
+let activeBg = 1;
+
+function checkDate() {
+    const input = document.getElementById("dateInput");
+    const card = document.getElementById("step1");
+
+    if(input.value === correctDate) {
+        document.getElementById("bgMusic").play();
+        nextStep(1, 2);
+    } else {
+        confetti({
+            particleCount: 100,
+            spread: 60,
+            origin: { y: 0.6 },
+            colors: ['#d90429', '#3d3d3d', '#000000'],
+            shapes: ['square']
+        });
+        
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 400);
+        
+        alert("Wrong date, Chubs! 🤨 Galit na ako haha!");
+    }
+}
+
+function nextStep(current, next) {
+    const currentEl = document.getElementById('step' + current);
+    const nextEl = document.getElementById(next === 4 ? 'finalCard' : 'step' + next);
+    currentEl.classList.add('hidden');
+    setTimeout(() => {
+        currentEl.style.display = 'none';
+        nextEl.style.display = 'block';
+        setTimeout(() => nextEl.classList.add('fade-in'), 10);
+        if(next === 4) { 
+            updateCounter(); 
+            startSlideshow(); 
+            triggerInitialBurst();
+            continuousConfetti(); 
+        }
+    }, 500);
+}
+
+function startSlideshow() {
+    setBackground(images[currentIndex]);
+    setInterval(() => {
+        currentIndex = (currentIndex + 1) % images.length;
+        setBackground(images[currentIndex]);
+    }, 4500); 
+}
+
+function setBackground(image) {
+    const bg1 = document.getElementById("bg1");
+    const bg2 = document.getElementById("bg2");
+    const nextBg = (activeBg === 1) ? bg2 : bg1;
+    const currentBg = (activeBg === 1) ? bg1 : bg2;
+    nextBg.style.backgroundImage = `url('${image}')`;
+    nextBg.classList.add("active");
+    currentBg.classList.remove("active");
+    activeBg = (activeBg === 1) ? 2 : 1;
+}
+
+function triggerInitialBurst() { confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ffafcc', '#ff8fab', '#ffffff'] }); }
+
+function continuousConfetti() {
+    var end = Date.now() + (600 * 1000);
+    (function frame() {
+      confetti({ particleCount: 1, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ffafcc', '#ffffff'] });
+      confetti({ particleCount: 1, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ffafcc', '#ffffff'] });
+      if (Date.now() < end) requestAnimationFrame(frame);
+    }());
+}
+
+function updateCounter() {
+    const now = new Date();
+    const diff = now - startDate;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    document.getElementById("daysCounter").innerText = (days + 1983);
+}
+
+const notes = ["Your kindness is my favorite thing about you. 💖", "You are literally the most adorable human ever. 🧸", "I'm the luckiest guy to have you my bebe. ✨", "Happy Anniversary! Here's to forever. 🎀", "I love you more than words can say. 🌸"];
+
+function showNote() {
+    const box = document.getElementById("noteBox");
+    box.classList.remove("show-note", "hidden");
+    box.innerText = notes[Math.floor(Math.random() * notes.length)];
+    setTimeout(() => { box.classList.add("show-note"); }, 50);
+}
+</script>
+</body>
+</html>
